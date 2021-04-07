@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "2+UPCuTrc9IqVJmnVwOfTVEHJE4ZIScXYN35Adjb7vxOJvkhfp10rMk7zuSKtbQ5O9uRMQauJal6nKtqokUilw==",
+  "success": true,
+  "projectFilePath": "E:\\Documents\\Projects\\CK3_CoA_Editor\\CoAEditor\\CoAEditor\\CoAEditor.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Salvador Gonzalez\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
+    "C:\\Users\\Salvador Gonzalez\\.nuget\\packages\\microsoft.win32.systemevents\\5.0.0\\microsoft.win32.systemevents.5.0.0.nupkg.sha512",
+    "C:\\Users\\Salvador Gonzalez\\.nuget\\packages\\system.drawing.common\\5.0.1\\system.drawing.common.5.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}

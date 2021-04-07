@@ -1,0 +1,6 @@
+# Ignore patterns and emblems directories
+**/coat_of_arms
+
+# Ignore config file
+CoA_Editor.cfg
+*.png
