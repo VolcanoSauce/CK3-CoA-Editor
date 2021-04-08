@@ -1,0 +1,237 @@
+﻿<UserControl x:Class="CoAEditor.Views.CoaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CoAEditor.Views"
+             xmlns:viewModel="clr-namespace:CoAEditor.ViewModels"
+             xmlns:data ="clr-namespace:CoAEditor.Models"
+             xmlns:vml="clr-namespace:CoAEditor.VML"
+             vml:ViewModelLocator.AutoHookedUpViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="768" d:DesignWidth="1024">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <!--REF: 1 data type to 1 dataTemplate-->
+        <!--<DataTemplate DataType="{x:Type data:CoaModel}">-->
+        
+        <DataTemplate x:Key="coaLayers">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{Binding Path=FullInfo, Mode=OneWay}"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="drawSpace">
+            <Canvas Background="Transparent">
+                <Image Source="{Binding Path=ImgComponent, Mode=OneWay}" Width="{Binding Path=Width, Mode=OneWay}" Height="{Binding Path=Height, Mode=OneWay}" Canvas.Top="{Binding Path=Ypos}" Canvas.Left="{Binding Path=Xpos}" UseLayoutRounding="True"/>
+            </Canvas>
+        </DataTemplate>
+
+        <DataTemplate x:Key="propsPanel">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Scale:" Margin="5 0 3 15"/>
+                    <Slider Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Width="200" Margin="5 0 0 0" Value="{Binding Path=Scale, Mode=TwoWay}"/>
+                    <TextBox Text="{Binding Path=Scale, Mode=TwoWay}" Width="25" Margin="5 0 3 15"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="XPos:" Margin="5 0 3 15"/>
+                    <Slider Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Width="200" Margin="5 0 0 0" Value="{Binding Path=SliderXpos, Mode=TwoWay}"/>
+                    <TextBox Text="{Binding Path=SliderXpos, Mode=TwoWay}" Width="25" Margin="5 0 3 15"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="YPos:" Margin="5 0 3 15"/>
+                    <Slider Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Width="200" Margin="5 0 0 0" Value="{Binding Path=SliderYpos, Mode=TwoWay}"/>
+                    <TextBox Text="{Binding Path=SliderYpos, Mode=TwoWay}" Width="25" Margin="5 0 3 15"/>
+                </StackPanel>
+
+                <!--<ItemsControl ItemsSource="{Binding Colors}" AlternationCount="4">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="1" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Margin="5 0 3 15" Text="{Binding Path=(ItemsControl.AlternationIndex),
+                                    RelativeSource={RelativeSource Mode=TemplatedParent},
+                                    FallbackValue=FAIL,
+                                    StringFormat={}Color {0}: }" />
+                                    <TextBlock Text="{Binding Path=DrawingColor, Mode=OneWay}" Width="100" Margin="5 0 3 15"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>-->
+                
+            </StackPanel>
+        </DataTemplate>
+
+    </UserControl.Resources>
+    
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_New" ToolTip="Create a New File"/>
+                    <MenuItem Header="_Open" ToolTip="Open a File"/>
+                    <MenuItem Header="_Save" ToolTip="Save current File" Command="{Binding ExportCk3FormatCommand}" />
+                    <Separator />
+                    <MenuItem Header="_Exit" ToolTip="Exit Program"/>
+                </MenuItem>
+                <MenuItem Header="_About">
+                    <MenuItem Header="_Version" />
+                </MenuItem>
+            </Menu>
+
+            <Grid DockPanel.Dock="Bottom" Height="80">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Button Grid.Column="0"
+                        Content="Insert Item"
+                        Command="{Binding AddCoaComponentCommand}"
+                        VerticalAlignment="Center"
+                        Padding="8"
+                        Width="160"/>
+
+                <Button Grid.Column="2"
+                        Content="Export to CK3"
+                        Command="{Binding ExportCk3FormatCommand}"
+                        ToolTip="Export to CK3 Text Format"
+                        VerticalAlignment="Center"
+                        Padding="8"
+                        Width="160"/>
+
+            </Grid>
+
+            <StackPanel Orientation="Vertical" DockPanel.Dock="Right">
+                <ListBox ItemsSource="{Binding CoaList}" ItemTemplate="{StaticResource coaLayers}" SelectedItem="{Binding SelectedCoa}"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Delete"
+                        Command="{Binding DeleteCommand}"
+                        VerticalAlignment="Top"
+                        Padding="15"
+                        Margin="10"/>
+
+                    <Button Content="Duplicate"
+                            Command="{Binding DuplicateCommand}"
+                            VerticalAlignment="Top"
+                            Padding="15"
+                            Margin="10"/>
+
+                    <Button Content="↑"
+                        Command="{Binding MoveUpCommand}"
+                        VerticalAlignment="Top"
+                        Padding="15"
+                        Width="64"
+                        Margin="10"/>
+
+                    <Button Content="↓"
+                        Command="{Binding MoveDownCommand}"
+                        VerticalAlignment="Top"
+                        Padding="15"
+                        Width="64"
+                        Margin="10"/>
+
+                </StackPanel>
+                <ContentControl Content="{Binding Path=SelectedCoa}" ContentTemplate="{StaticResource propsPanel}"/>
+
+                <ListBox ItemsSource="{Binding CustomColors}" SelectedItem="{Binding SelectedCustomColor}" AlternationCount="4">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <!--FOR CONTENT CONTROL-->
+                                <!--<TextBlock Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent},
+                                    Path=(ItemsControl.AlternationIndex)}"/>-->
+
+                                <!--FOR LISTBOX-->
+                                <!--<TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem},
+                                    Path=(ItemsControl.AlternationIndex)}"/>-->
+
+                                <TextBlock Text="{Binding Path=(ItemsControl.AlternationIndex),
+                                    RelativeSource={RelativeSource AncestorType=ListBoxItem},
+                                    FallbackValue=FAIL,
+                                    StringFormat={}Color {0}: }" />
+                                <TextBlock Text="{Binding Path=FormattedStringColor}" Margin="2"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock Margin="5 5 3 15" Text="{Binding Path=ColorHue, StringFormat={}Color Hue ➜ {0}}"/>
+                <!--<TextBlock>
+                    <Run Text="Color Hue ➜ "/>
+                    <Run Text="{Binding Path=ColorHue}" />
+                </TextBlock>-->
+                <Slider Minimum="0" Maximum="360" TickFrequency="1" IsSnapToTickEnabled="True" Width="280" Value="{Binding Path=ColorHue, Mode=TwoWay}"/>
+
+                <TextBlock Margin="5 5 3 15" Text="{Binding Path=ColorSaturation, StringFormat={}Color Saturation ➜ {0}}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="-0.1" Command="{Binding ChangeSL}" CommandParameter="S:-1" Margin="5 0 3 15" Padding="8" Width="86"/>
+                    <Button Content="+0.1" Command="{Binding ChangeSL}" CommandParameter="S:+1" Margin="5 0 3 15" Padding="8" Width="86"/>
+                </StackPanel>
+
+                <TextBlock Margin="5 5 3 15" Text="{Binding Path=ColorLightness, StringFormat={}Color Lightness ➜ {0}}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="-0.1" Command="{Binding ChangeSL}" CommandParameter="L:-1" Margin="5 0 3 15" Padding="8" Width="86"/>
+                    <Button Content="+0.1" Command="{Binding ChangeSL}" CommandParameter="L:+1" Margin="5 0 3 15" Padding="8" Width="86"/>
+                </StackPanel>
+
+
+                <Button Content="COLOR PICKER"
+                        Command="{Binding PickColorCommand}"
+                        CommandParameter="0"
+                        Padding="8"
+                        Margin="8"
+                        Width="180"/>
+            </StackPanel>
+
+            <WrapPanel  Orientation="Vertical" Width="250" HorizontalAlignment="Left" DockPanel.Dock="Left">
+                <!--REF: 1 data type to 1 dataTemplate--> 
+                <!--<ListBox ItemsSource="{Binding CoaList}" SelectedItem="{Binding SelectedCoa}"/>-->
+
+                <ListBox ItemsSource="{Binding CoaComponents}" SelectedItem="{Binding SelectedComponent}" Width="230">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{Binding Path=.}" Margin="2">
+                                    <!--NOT WORKING-->
+                                    <!--<TextBlock.InputBindings>
+                                        <MouseBinding Gesture="LeftDoubleClick"
+                                            Command="{Binding AddCoaComponentCommand}" />
+                                    </TextBlock.InputBindings>-->
+                                     <!--NOT WORKING-->
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Button Content="Set Crusader Kings 3 Root Directory"
+                        Command="{Binding SetCk3RootCommand}"
+                        Visibility="{Binding Path=CoaCompFilesBtnVisibility, Converter={StaticResource BoolToVis}}"
+                        HorizontalAlignment="Center" 
+                        Margin="10" 
+                        Padding="5"/>
+            </WrapPanel>
+
+            <Border Background="LightSteelBlue">
+                <Canvas Width="256" Height="256" Background="WhiteSmoke">
+                    <ItemsControl ItemsSource="{Binding CoaList}" ItemTemplate="{StaticResource drawSpace}" Focusable="False"/>
+                </Canvas>
+            </Border>
+        </DockPanel>
+    </Grid>
+</UserControl>
