@@ -76,14 +76,14 @@
         <DockPanel LastChildFill="True">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_New" ToolTip="Create a New File"/>
-                    <MenuItem Header="_Open" ToolTip="Open a File"/>
-                    <MenuItem Header="_Save" ToolTip="Save current File" Command="{Binding ExportCk3FormatCommand}" />
+                    <MenuItem Header="_New" ToolTip="Create a New File" Command="{Binding NewCoaCommand}"/>
+                    <MenuItem Header="_Open WIP" ToolTip="Open a File"/>
+                    <MenuItem Header="_Save WIP" ToolTip="Save current File" Command="{Binding ExportCk3FormatCommand}" />
                     <Separator />
-                    <MenuItem Header="_Exit" ToolTip="Exit Program"/>
+                    <MenuItem Header="_Exit" ToolTip="Exit Program" Command="{Binding ExitAppCommand}"/>
                 </MenuItem>
                 <MenuItem Header="_About">
-                    <MenuItem Header="_Version" />
+                    <MenuItem Header="_Version"/>
                 </MenuItem>
             </Menu>
 

@@ -23,6 +23,8 @@ namespace CoAEditor.ViewModels {
         public MyICommand SetCk3RootCommand { get; set; }
         public MyICommand AddCoaComponentCommand { get; set; }
         public MyICommand ExportCk3FormatCommand { get; set; }
+        public MyICommand NewCoaCommand { get; set; }
+        public MyICommand ExitAppCommand { get; set; }
         public MyICommandWithParameter<string> PickColorCommand { get; set; }
         public MyICommandWithParameter<string> ChangeSL { get; set; }
 
@@ -41,6 +43,8 @@ namespace CoAEditor.ViewModels {
             SetCk3RootCommand = new MyICommand(OnSetCk3Root, CanSetCk3Root);
             AddCoaComponentCommand = new MyICommand(OnAddComponent, CanAddComponent);
             ExportCk3FormatCommand = new MyICommand(OnExportCk3Format, CanDelete);
+            NewCoaCommand = new MyICommand(OnNewCoa, () => { return true; });
+            ExitAppCommand = new MyICommand(() => { System.Windows.Application.Current.Shutdown(); }, () => { return true; });
             PickColorCommand = new MyICommandWithParameter<string>(OnPickColor, CanPickColor);
             ChangeSL = new MyICommandWithParameter<string>(OnChangeSL, CanPickColor);
 
@@ -310,7 +314,8 @@ namespace CoAEditor.ViewModels {
             var coaJson = JsonSerializer.Serialize(SelectedCoa, options);
             //System.Windows.MessageBox.Show(coaJson);
 
-            StringBuilder sb = new StringBuilder("custom_coat_of_arms = {\r\n");
+            //StringBuilder sb = new StringBuilder("custom_coat_of_arms = {\r\n");
+            StringBuilder sb = new StringBuilder();
             foreach (CoaModel coa in CoaList) {
                 string coaName = coa.ImagePath.Remove(coa.ImagePath.LastIndexOf('.')).Substring(coa.ImagePath.LastIndexOf('/') + 1);
                 string c0 = string.Format(" {0} {1} {2} ", coa.Colors[0].R.ToString(), coa.Colors[0].G.ToString(), coa.Colors[0].B.ToString());
@@ -318,28 +323,32 @@ namespace CoAEditor.ViewModels {
                 string c2 = string.Format(" {0} {1} {2} ", coa.Colors[2].R.ToString(), coa.Colors[2].G.ToString(), coa.Colors[2].B.ToString());
 
                 if (coa.IsPattern) {
-                    sb.AppendLine(string.Format("\tpattern = \"{0}.dds\"", coaName));
+                    sb.AppendLine(string.Format("pattern = \"{0}.dds\"", coaName));
+                    sb.AppendLine(string.Format("color1 = rgb {{{0}}}", c0));
+                    sb.AppendLine(string.Format("color2 = rgb {{{0}}}", c1));
+                    sb.AppendLine(string.Format("color3 = rgb {{{0}}}", c2));
+                    sb.AppendLine("");
+                } else {
+                    sb.AppendLine("colored_emblem = {");
                     sb.AppendLine(string.Format("\tcolor1 = rgb {{{0}}}", c0));
                     sb.AppendLine(string.Format("\tcolor2 = rgb {{{0}}}", c1));
                     sb.AppendLine(string.Format("\tcolor3 = rgb {{{0}}}", c2));
-                    sb.AppendLine("");
-                } else {
-                    sb.AppendLine("\tcolored_emblem = {");
-                    sb.AppendLine(string.Format("\t\tcolor1 = rgb {{{0}}}", c0));
-                    sb.AppendLine(string.Format("\t\tcolor2 = rgb {{{0}}}", c1));
-                    sb.AppendLine(string.Format("\t\tcolor3 = rgb {{{0}}}", c2));
-                    sb.AppendLine(string.Format("\t\ttexture = \"{0}.dds\"", coaName));
+                    sb.AppendLine(string.Format("\ttexture = \"{0}.dds\"", coaName));
                     sb.AppendLine("\t\tinstance = {");
-                    sb.AppendLine(string.Format("\t\t\tposition = {{ {0:F} {1:F} }}", coa.SliderXpos / 100, coa.SliderYpos / 100));
-                    sb.AppendLine(string.Format("\t\t\tscale = {{ {0:F} {1:F} }}", coa.Scale / 100, coa.Scale / 100));
-                    sb.AppendLine("\t\t}");
+                    sb.AppendLine(string.Format("\t\tposition = {{ {0:F} {1:F} }}", coa.SliderXpos / 100, coa.SliderYpos / 100));
+                    sb.AppendLine(string.Format("\t\tscale = {{ {0:F} {1:F} }}", coa.Scale / 100, coa.Scale / 100));
                     sb.AppendLine("\t}");
+                    sb.AppendLine("}");
                     sb.AppendLine("");
                 }
             }
-            sb.AppendLine("}");
+            //sb.AppendLine("}");
             System.Windows.Clipboard.SetText(sb.ToString());
-            System.Windows.MessageBox.Show(sb.ToString(), "Coat of Arms");
+            System.Windows.MessageBox.Show(sb.ToString(), "Custom Coat of Arms");
+        }
+
+        private void OnNewCoa() {
+            CoaList.Clear();
         }
 
         private void OnPickColor(string numColor) {
