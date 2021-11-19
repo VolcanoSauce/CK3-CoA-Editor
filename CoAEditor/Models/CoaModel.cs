@@ -24,7 +24,7 @@ namespace CoAEditor.Models {
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public CoaModel() { 
+        public CoaModel() {
             
         }
 
